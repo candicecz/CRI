@@ -58,7 +58,7 @@ const BarChart: React.FC<BarChartProps> = ({data}) => {
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
 
   // select a different segment population ever time delay.
-  const delay = 5000;
+  const delay = 2000;
   useInterval(() => {
     setCurrentSegmentIndex(() => {
       // After cycling through all population segments, return to the first segment

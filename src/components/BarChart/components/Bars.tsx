@@ -27,6 +27,7 @@ const Bars: React.FC<BarProps> = ({
   data,
   selectedLocationIndex,
 }) => {
+  let canada_accessor = data.location_segments[0].accessor;
   // Set sizes based on parent element's bounding box.
   const sizes = {
     w: parentWidth || 400,
@@ -46,7 +47,7 @@ const Bars: React.FC<BarProps> = ({
       let bars_data: BarsVizData = {
         student_type: segment.student_type,
         canada_average: +segment.canada_average,
-        // university_average: 0,
+        university_average: 0,
       };
       if (selectedLocationIndex !== 0) {
         bars_data = {
@@ -74,10 +75,9 @@ const Bars: React.FC<BarProps> = ({
       return [Math.min(...values), Math.max(...values)];
     };
     // min max num of students of a certain type
-    let [min, max] = getStudentsMinMax();
     let [students_min, students_max] = [
       0,
-      Math.round(max * 50) / 50, // round up to nearest 50
+      Math.round(getStudentsMinMax()[1] / 50) * 50, // round up to nearest 50
     ];
 
     // numStudentsScale(x-axis) is based the number(in percent) of students of a particular type in a location.
@@ -107,8 +107,10 @@ const Bars: React.FC<BarProps> = ({
       },
     };
   }, [max_w, student_types, max_h, data.student_segments]);
+
+  // Determines the y value of the bars within each bar group
   const locationScale = scaleBand({
-    domain: bar_keys,
+    domain: selectedLocationIndex === 0 ? [canada_accessor] : bar_keys,
     padding: 0.5,
   }).rangeRound([0, axes.studentTypes.scale.bandwidth()]);
 
@@ -119,18 +121,18 @@ const Bars: React.FC<BarProps> = ({
   return (
     <svg className={"bars"} width={sizes.w} height={sizes.h}>
       <Group transform={`translate(${margins.left},${margins.top})`}>
-        {/* <GridRows
-        scale={axes.yScale.scale}
-        stroke="#e0e0e0"
-        width={max_w}
-        tickValues={axes.yScale.values}
-      ></GridRows>
-      <GridColumns
-        scale={axes.xScale.scale}
-        stroke="#e0e0e0"
-        height={max_h}
-        tickValues={axes.xScale.values}
-      ></GridColumns> */}
+        <GridRows
+          scale={axes.studentTypes.scale}
+          stroke="#e0e0e0"
+          width={max_w}
+          tickValues={axes.studentTypes.values}
+        ></GridRows>
+        <GridColumns
+          scale={axes.studentNums.scale}
+          stroke="#e0e0e0"
+          height={max_h}
+          tickValues={axes.studentNums.values}
+        ></GridColumns>
         <BarGroupHorizontal
           data={bars_data}
           keys={bar_keys}
@@ -145,15 +147,30 @@ const Bars: React.FC<BarProps> = ({
             barGroups.map(barGroup => {
               return (
                 <Group key={`bar_id_${barGroup.index}`} top={barGroup.y0}>
-                  {barGroup.bars.map(bar => {
+                  {barGroup.bars.reverse().map(bar => {
+                    // Checks if the current bar is part of the canada only view
+                    const showOnlyCanada =
+                      bar.key === canada_accessor &&
+                      selectedLocationIndex === 0;
+
                     return (
                       <Bar
                         key={`bar-group-bar-${barGroup.index}-${bar.index}`}
                         x={bar.x}
-                        y={bar.y}
+                        y={
+                          selectedLocationIndex === 0
+                            ? locationScale(canada_accessor)
+                            : bar.y
+                        }
                         width={bar.width}
                         height={bar.height}
                         fill={bar.color}
+                        opacity={
+                          bar.key !== canada_accessor &&
+                          selectedLocationIndex === 0
+                            ? 0.75
+                            : 1
+                        }
                         rx={bar.height / 2}
                       ></Bar>
                     );
