@@ -1,15 +1,10 @@
 import React, {useState} from "react";
-import BarChart from "src/components/BarChart";
+import BarChart, {CRIData} from "src/components/BarChart/index";
 import * as d3 from "d3";
 import "./App.scss";
-import {CRIData} from "src/components/BarChart";
 
 type ResData = CRIData | null;
 
-// replace all spaces and symbols in string with an underscore.
-const format_student_types = (str: string): string => {
-  return str.toLowerCase().replace(/[^A-Z0-9]/gi, "_");
-};
 const format_population_segment = (str: string): string => {
   if (str.includes("univ")) {
     return `University ${str.match(/\d+/g)}`;
@@ -24,41 +19,33 @@ const App: React.FC = () => {
   if (!data) {
     // Retrieve the data and process it for the bar chart.
     d3.csv(`${process.env.PUBLIC_URL}/data/cri-data.csv`).then(data => {
-      let processed_data = data.reduce((r: any, d, i): CRIData | {} => {
-        let student_bracket: string;
+      let location_segments: {text: string; accessor: string}[];
+      let processed_data = data.map(d => {
         // Segment of polled population(e.g. university)
-        const population_segments = Object.keys(d).filter(
-          s => s !== "student_types",
-        );
+        location_segments = data.columns
+          .filter(s => s !== "student_types")
+          .map(segment => ({
+            text: format_population_segment(segment),
+            accessor: segment,
+          }));
 
-        if (!r["population_segments"]) {
-          r["population_segments"] = population_segments.map(segment =>
-            format_population_segment(segment),
-          );
-        }
-        // Types of students in polled population
-        if (!r["student_types"]) {
-          r["student_types"] = [];
-        }
-        population_segments.map(segment => {
-          if (!r[segment]) {
-            r[segment] = {};
-          }
-          return null;
-        });
-        Object.entries(d).map(([k, v]) => {
+        return Object.entries(d).reduce((r: any, [k, v], i) => {
           if (k === "student_types") {
-            student_bracket = format_student_types(v!);
-            return r["student_types"].push(student_bracket);
+            r["student_type"] = v;
           } else {
-            return (r[k] = {...r[k], [student_bracket]: parseInt(v!)});
+            r[k] = parseInt(v!) || v;
           }
-        });
-        return r;
-      }, {});
+          return r;
+        }, {});
+      });
+
       setData((prev: any) => {
         if (Object.keys(processed_data).length > 0) {
-          return {...prev, ...processed_data};
+          return {
+            ...prev,
+            location_segments: location_segments,
+            student_segments: processed_data,
+          };
         }
         return prev;
       });
@@ -68,7 +55,6 @@ const App: React.FC = () => {
     // Show loading indicator if data is not present
     return <div>loading data...</div>;
   }
-
   return (
     <div>
       <BarChart data={data} />

@@ -4,8 +4,13 @@ $CRI_GREY: rgb(191, 191, 191);
 $FONT_COLOR: #3d3d3d;
 
 #barchart {
+  min-width: 400px;
+  max-width: 732px;
+  margin: 0 auto;
   .segment-wrapper {
     position: relative;
+    min-height: 4rem;
+    padding-bottom: 2rem;
     .segment {
       position: absolute;
       top: 0;
@@ -19,6 +24,15 @@ $FONT_COLOR: #3d3d3d;
         font-weight: 400;
         text-transform: capitalize;
         color: $FONT_COLOR;
+      }
+    }
+  }
+  .bars {
+    .visx-group {
+      .visx-group {
+        .visx-bar {
+          transition: width 1000ms, height 750ms, y 150ms;
+        }
       }
     }
   }
