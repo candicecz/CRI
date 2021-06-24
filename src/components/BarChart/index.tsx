@@ -52,11 +52,11 @@ interface BarChartProps {
 
 const BarChart: React.FC<BarChartProps> = ({data}) => {
   const {location_segments} = data;
-  const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
-  const [showButtons, setShowButtons] = useState(true);
+  const [currentSegmentIndex, setCurrentSegmentIndex] = useState(4);
+  const [showControls, setShowControls] = useState(false);
 
   // select a different segment population ever time delay.
-  const delay = 3500;
+  const delay = showControls ? 0 : 3500;
   useInterval(() => {
     setCurrentSegmentIndex(() => {
       // After cycling through all population segments, return to the first segment
@@ -66,8 +66,6 @@ const BarChart: React.FC<BarChartProps> = ({data}) => {
       return currentSegmentIndex + 1;
     });
   }, delay);
-  if (showButtons) {
-  }
 
   return (
     <div id="barchart">
@@ -75,9 +73,45 @@ const BarChart: React.FC<BarChartProps> = ({data}) => {
         currentSegmentIndex={currentSegmentIndex}
         locationSegments={location_segments}
       />
+      {showControls && (
+        <div className="controls">
+          <form>
+            {location_segments.map((location, i) => {
+              return (
+                <div className="form-inputs">
+                  <input
+                    id={location.accessor}
+                    type="radio"
+                    name="location"
+                    checked={
+                      location_segments[currentSegmentIndex].accessor ===
+                      location.accessor
+                    }
+                    onChange={() => setCurrentSegmentIndex(i)}
+                  ></input>
+                  <label className={"label"} htmlFor={location.accessor}>
+                    {location.text}
+                  </label>
+                </div>
+              );
+            })}
+          </form>
+        </div>
+      )}
 
       <Bars data={data} selectedLocationIndex={currentSegmentIndex} />
       <div className={"legend"}></div>
+      <div style={{marginTop: "2rem"}}>
+        <input
+          id={"showRadios"}
+          type={"checkbox"}
+          checked={showControls}
+          onChange={() => setShowControls(!showControls)}
+        ></input>
+        <label htmlFor={"showRadios"} style={{marginLeft: "8px"}}>
+          Show Buttons
+        </label>
+      </div>
     </div>
   );
 };

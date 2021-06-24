@@ -201,7 +201,7 @@ const Bars: React.FC<BarProps> = ({
                           }}
                         >
                           <Text
-                            className={"bar-label"}
+                            className={"label bar-label"}
                             key={`bar-text-${barGroup.index}-${bar.index}`}
                             verticalAnchor={"middle"}
                             dx={"0.5em"}
@@ -256,7 +256,7 @@ const Bars: React.FC<BarProps> = ({
                 const {x, y} = label.from;
                 return (
                   <Text
-                    className="axis-label"
+                    className="label axis-label"
                     key={i}
                     x={x}
                     y={y}
@@ -278,7 +278,7 @@ const Bars: React.FC<BarProps> = ({
             top={max_h}
             numTicks={5}
             tickLabelProps={() => ({
-              className: "axis-label",
+              className: "label axis-label",
               textAnchor: "middle",
               dy: -5,
               dx: "0.5em",
