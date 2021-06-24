@@ -1,14 +1,11 @@
-// INDEX
-
 import React, {useState} from "react";
 import {useInterval} from "src/hooks/useInterval";
 import Header from "./components/Header";
-
 import "./BarChart.scss";
 
 import Bars from "./components/Bars";
 
-// The types of students poled.
+// The types of students polled.
 export type StudentType =
   | "Conscientious Achievers"
   | "Social Extroverts"
@@ -56,9 +53,10 @@ interface BarChartProps {
 const BarChart: React.FC<BarChartProps> = ({data}) => {
   const {location_segments} = data;
   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
+  const [showButtons, setShowButtons] = useState(true);
 
   // select a different segment population ever time delay.
-  const delay = 2000;
+  const delay = 3500;
   useInterval(() => {
     setCurrentSegmentIndex(() => {
       // After cycling through all population segments, return to the first segment
@@ -68,13 +66,15 @@ const BarChart: React.FC<BarChartProps> = ({data}) => {
       return currentSegmentIndex + 1;
     });
   }, delay);
+  if (showButtons) {
+  }
 
   return (
     <div id="barchart">
-      {/* <Header
+      <Header
         currentSegmentIndex={currentSegmentIndex}
         locationSegments={location_segments}
-      /> */}
+      />
 
       <Bars data={data} selectedLocationIndex={currentSegmentIndex} />
       <div className={"legend"}></div>

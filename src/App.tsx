@@ -5,9 +5,18 @@ import "./App.scss";
 
 type ResData = CRIData | null;
 
-const format_population_segment = (str: string): string => {
+// Format the label for the location.
+const format_location_string = (str: string): string => {
   if (str.includes("univ")) {
-    return `University ${str.match(/\d+/g)}`;
+    let location_string = "University";
+    // Instead of numbering the universities, let's turn it to letters.
+    const alpha = ["A", "B", "C", "D", "E"];
+    let num = str.match(/\d+/g);
+    if (num) {
+      let index = +num[0];
+      location_string = location_string + " " + alpha[index - 1];
+    }
+    return location_string;
   } else if (str === "canada_average") {
     return "Average across Canada";
   } else {
@@ -25,7 +34,7 @@ const App: React.FC = () => {
         location_segments = data.columns
           .filter(s => s !== "student_types")
           .map(segment => ({
-            text: format_population_segment(segment),
+            text: format_location_string(segment),
             accessor: segment,
           }));
 

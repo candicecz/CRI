@@ -2,6 +2,8 @@ import React from "react";
 import "../BarChart.scss";
 import {useTransition, animated} from "react-spring";
 import {LocationSegment} from "../index";
+import canada from "src/assets/canada.svg";
+import university from "src/assets/university.svg";
 
 interface HeaderProps {
   locationSegments: LocationSegment[];
@@ -29,8 +31,16 @@ const Header: React.FC<HeaderProps> = ({
             ...style,
           }}
         >
-          <img className={"segment-icon"} src="" alt="" />
-          <h5 className={"segment-title"}>{locationSegments[i].text}</h5>
+          <img
+            className={"segment-img"}
+            src={
+              locationSegments[i].accessor === "canada_average"
+                ? canada
+                : university
+            }
+            alt={`${locationSegments[i].accessor}`}
+          />
+          <h3 className={"segment-title"}>{locationSegments[i].text}</h3>
         </animated.div>
       ))}
     </div>
